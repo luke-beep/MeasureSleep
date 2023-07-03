@@ -1,5 +1,9 @@
 # MeasureSleep
 
-I take no credit for this, this is just a remake of https://github.com/amitxv/TimerResolution/releases
+### Credit
 
-For fun :)
+--- 
+
+https://learn.microsoft.com/en-us/windows/win32/multimedia/obtaining-and-setting-timer-resolution
+
+https://stackoverflow.com/questions/21156944/how-to-get-the-current-windows-system-wide-timer-resolution
