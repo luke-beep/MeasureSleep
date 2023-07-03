@@ -8,8 +8,7 @@ using CommandLine.Text;
 
 partial class Program
 {
-
-    //NTQUERYTIMERRESOLUTION NtQueryTimerResolution = (NTQUERYTIMERRESOLUTION)GetProcAddress(ntdll, "NtQueryTimerResolution");
+//https://learn.microsoft.com/en-us/windows/win32/multimedia/obtaining-and-setting-timer-resolution
     [LibraryImport("ntdll.dll")]
     private static partial int NtQueryTimerResolution(out uint minimum_resolution, out uint maximum_resolution, out uint current_resolution);
 
@@ -24,55 +23,18 @@ partial class Program
 
             for (int i = 1; ; i++)
             {
-                //Variables can't be negative here so I went with uint.
-                //ULONG minimum_resolution, maximum_resolution, current_resolution;
-                /* 
-                 
-                 
-                for (int i = 1;; i++) {
-                    if (NtQueryTimerResolution(&minimum_resolution, &maximum_resolution, &current_resolution) != 0) {
-                        std::cerr << "NtQueryTimerResolution failed\n";
-                        return 1;
-                }
-                 */
                 if (NtQueryTimerResolution(out uint minimum_resolution, out uint maximum_resolution, out uint current_resolution) != 0)
                 {
                     Console.WriteLine("NtQueryTimerResolution failed");
                     return;
                 }
-
-
-                /*
-                QueryPerformanceCounter(&start);
-                Sleep(1);
-                QueryPerformanceCounter(&end);
-                */
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
                 Thread.Sleep(1);
                 stopwatch.Stop();
-
-                //double delta_ms = delta_s * 1000;
-                //double delta_from_sleep = delta_ms - 1;
                 double delta_ms = stopwatch.Elapsed.TotalMilliseconds;
                 double delta_from_sleep = delta_ms - 1;
-
-                //std::cout << std::fixed << std::setprecision(12) << "Resolution: " << (current_resolution / 10000.0) << "ms, Sleep(1) slept " << delta_ms << "ms (delta: " << delta_from_sleep << ")\n";
                 Console.WriteLine($"Resolution: {current_resolution / 10000.0}ms, Sleep(1) slept {delta_ms}ms (delta: {delta_from_sleep})");
-
-
-                /* if (samples) {
-            sleep_delays.push_back(delta_from_sleep);
-
-            if (i == args::get(samples)) {
-                break;
-            }
-
-            Sleep(100);
-        } else {
-            Sleep(1000);
-        }*/
-
                 if (options.Samples.HasValue)
                 {
                     sleepDelays.Add(delta_from_sleep);
@@ -87,36 +49,6 @@ partial class Program
                     Thread.Sleep(1000);
                 }
             }
-
-
-            /*if (samples) {
-        // discard first trial since it is almost always invalid
-        sleep_delays.erase(sleep_delays.begin());
-
-        sort(sleep_delays.begin(), sleep_delays.end());
-
-        double sum = 0.0;
-        for (double delay : sleep_delays) {
-            sum += delay;
-        }
-
-        double average = sum / sleep_delays.size();
-
-        // stdev
-        double standard_deviation = 0.0;
-
-        for (double delay : sleep_delays) {
-            standard_deviation += pow(delay - average, 2);
-        }
-
-        double stdev = sqrt(standard_deviation / sleep_delays.size());
-
-        std::cout << "\nMax: " << sleep_delays.back() << "\n";
-        std::cout << "Avg: " << average << "\n";
-        std::cout << "Min: " << sleep_delays.front() << "\n";
-        std::cout << "STDEV: " << stdev << "\n";
-    }*/
-
                 if (options.Samples.HasValue)
             {
                 sleepDelays.RemoveAt(0);
